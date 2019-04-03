@@ -229,12 +229,12 @@ let battle = setInterval(() => {
   if(Math.round(Math.random()* 2) === 1) {
     ogre.clobber(dave);
     console.log(`${dave.name} has ${dave.healthPoints} left!`);
-    console.log();
+    console.log('\n');
   }
   else {
     dave.slay(ogre);
     console.log(`${ogre.name} has ${ogre.healthPoints} left!`);
-    console.log();
+    console.log('\n');
   }
 
   if(dave.healthPoints <= 0) {
