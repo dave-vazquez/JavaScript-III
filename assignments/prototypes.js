@@ -35,15 +35,59 @@ GameObject.prototype.destroy = function() {
 
 function CharacterStats(attr) {
   GameObject.call(this, attr);
+  /*
+    Output of the above would be something like: {
+      this.createdAt = attr.createdAt;
+      this.name = attr.name;
+      this.dimensions = attr.dimensions;
+    }
+    
+    ...with 'this' being set to the value of the CharacterStats object.
+    
+    Written out this way, you can see more clearly that with the power of 
+    the Object.call() method, the properties that once belonged to GameObject 
+    now belong to the CharacterStats object, and the property values passed to 
+    'attr' now have a place to be extracted and assigned to.
+  */
+
   this.healthPoints = attr.healthPoints;
+  /* 
+     The property above is the only property at this time that explicitly 
+     belongs to the CharacterStats object, although this property can
+     and will eventually be inherited by another object below.
+  */
 }
+
+
+// Note: a prototype can have both methods AND properties declared on it
 
 CharacterStats.prototype = Object.create(GameObject.prototype);
 
 CharacterStats.prototype.takeDamage = function () {
   return `${this.name} took damage`;
 }
+/*
+  The order of the above two lines of code matters:
 
+  The value of CharacterStats.prototype has to first be set 
+  to the value returned by Object.create(GameObject.prototype)
+  (a copy of the GameObject.prototype object) before any new 
+  methods are declared on CharacterStats.prototype.
+
+  If the order is switched, then the method declared on
+  CharacterStats.prototype will be immediately overwritten
+  by the GamObject.prototype and all the methods declared 
+  on _it_.
+
+  With the order set up correctly, the value of CharacterStats.prototype
+  is new equal to the GameObject.prototype and all _it's_ declared
+  methods and properties.
+
+  With this inheritance set in place, we can now safely declare additional 
+  methods on CharacterStats.prototype without overriding any existing ones.
+*/
+
+/* ***************************************************************************** */
 
 /*
   === Humanoid (Having an appearance or character resembling that of a human.) ===
@@ -57,6 +101,12 @@ CharacterStats.prototype.takeDamage = function () {
 
 function Humanoid(attr) {
   CharacterStats.call(this, attr);
+  /*
+      this.createdAt = attr.createdAt;
+      this.name = attr.name;
+      this.dimensions = attr.dimensions;
+      this.healthPoints = attr.healthPoints;
+  */
   this.team = attr.team;
   this.weapons = attr.weapons;
   this.language = attr.language;
@@ -126,17 +176,19 @@ const archer = new Humanoid({
   language: 'Elvish',
 });
 
+console.log(archer);
 
-// console.log(mage.createdAt); // Today's date
-// console.log(archer.dimensions); // { length: 1, width: 2, height: 4 }
-// console.log(swordsman.healthPoints); // 15
-// console.log(mage.name); // Bruce
-// console.log(swordsman.team); // The Round Table
-// console.log(mage.weapons); // Staff of Shamalama
-// console.log(archer.language); // Elvish
-// console.log(archer.greet()); // Lilith offers a greeting in Elvish.
-// console.log(mage.takeDamage()); // Bruce took damage.
-// console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
+
+console.log(mage.createdAt); // Today's date
+console.log(archer.dimensions); // { length: 1, width: 2, height: 4 }
+console.log(swordsman.healthPoints); // 15
+console.log(mage.name); // Bruce
+console.log(swordsman.team); // The Round Table
+console.log(mage.weapons); // Staff of Shamalama
+console.log(archer.language); // Elvish
+console.log(archer.greet()); // Lilith offers a greeting in Elvish.
+console.log(mage.takeDamage()); // Bruce took damage.
+console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
 
 
   // Stretch task: 
@@ -145,6 +197,10 @@ const archer = new Humanoid({
   // * Create two new objects, one a villain and one a hero and fight it out with methods!
 
 function Villain(attr) {
+  Humanoid.call(this, attr);
+}
+
+function Hero(attr) {
   Humanoid.call(this, attr);
 }
 
@@ -160,10 +216,25 @@ Villain.prototype.clobber = function(foe) {
 
   foe.takeDamage();
 
-  if(foe.healthPoints >= 0) {
-    foe.destroy();
+  if(foe.healthPoints <= 0) {
+    console.log(foe.destroy());
+  }
+}
 
-    return 'Won!';
+Hero.prototype = Object.create(Humanoid.prototype);
+
+Hero.prototype.slay = function(foe) {
+  
+  let weaponNum = Math.round(Math.random()); 
+  
+  weaponNum === 0 ? foe.healthPoints -= 5 : foe.healthPoints -= 4;
+
+  console.log(`${this.name} used ${this.weapons[weaponNum]} on ${foe.name}! `);
+
+  foe.takeDamage();
+
+  if(foe.healthPoints <= 0) {
+    foe.destroy();
   }
 }
 
@@ -174,7 +245,7 @@ const ogre = new Villain({
     width: 5,
     height: 10,
   },
-  healthPoints: 200,
+  healthPoints: 50,
   name: 'Grok',
   team: 'Cave of Doom',
   weapons: [
@@ -184,28 +255,6 @@ const ogre = new Villain({
   language: 'Ogric',
 });
 
-
-function Hero(attr) {
-  Humanoid.call(this, attr);
-}
-
-Hero.prototype = Object.create(Humanoid.prototype);
-
-Hero.prototype.slay = function(foe) {
-  
-  let weaponNum = Math.round(Math.random()); 
-  
-  weaponNum === 0 ? foe.healthPoints -= 3 : foe.healthPoints -= 2;
-
-  console.log(`${this.name} used ${this.weapons[weaponNum]} on ${foe.name}`);
-
-  foe.takeDamage();
-
-  if(foe.healthPoints >= 0) {
-    foe.destroy();
-  }
-}
-
 const dave = new Hero({
   createdAt: new Date(),
   dimensions: {
@@ -213,7 +262,7 @@ const dave = new Hero({
     width: 3,
     height: 8,
   },
-  healthPoints: 150,
+  healthPoints: 30,
   name: 'Dave',
   team: '',
   weapons: [
@@ -224,29 +273,24 @@ const dave = new Hero({
 });
 
 
-
 let battle = setInterval(() => {
+
   if(Math.round(Math.random()* 2) === 1) {
     ogre.clobber(dave);
-    console.log(`${dave.name} has ${dave.healthPoints} left!`);
+    console.log(`${dave.name} has ${dave.healthPoints} HP left!`);
     console.log('\n');
   }
   else {
     dave.slay(ogre);
-    console.log(`${ogre.name} has ${ogre.healthPoints} left!`);
+    console.log(`${ogre.name} has ${ogre.healthPoints} HP left!`);
     console.log('\n');
   }
 
-  if(dave.healthPoints <= 0) {
-    console.log(`${dave.name} DIED.`);
-    clearInterval(battle);
-  }
-  else if (ogre.healthPoints <= 0){
-    console.log(`${ogre.name} DIED.`)
+  if(dave.healthPoints <= 0 || ogre.healthPoints <= 0) {
     clearInterval(battle);
   }
 
-}, 1000);
+}, 2000);
 
 
 
