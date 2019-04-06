@@ -36,6 +36,8 @@ GameObject.prototype.destroy = function() {
 function CharacterStats(attr) {
   GameObject.call(this, attr);
   /*
+    *********************** NOTES FOR SELF ******************************
+
     Output of the above would be something like: {
       this.createdAt = attr.createdAt;
       this.name = attr.name;
@@ -44,40 +46,45 @@ function CharacterStats(attr) {
     
     ...with 'this' being set to the value of the CharacterStats object.
     
-    Written out this way, you can see more clearly that with the power of 
-    the Object.call() method, the properties that once belonged to GameObject 
-    now belong to the CharacterStats object, and the property values passed to 
-    'attr' now have a place to be extracted and assigned to.
+    Written out this way, you can see more clearly that the properties that 
+    once belonged to GameObject now belong to the CharacterStats object, and 
+    the property values passed to 'attr' now have a place to be extracted and 
+    assigned to.
+
+    *********************** NOTES FOR SELF ******************************
   */
 
   this.healthPoints = attr.healthPoints;
   /* 
+     *********************** NOTES FOR SELF ******************************
+
      The property above is the only property at this time that explicitly 
      belongs to the CharacterStats object, although this property can
-     and will eventually be inherited by another object below.
+     inherited by another just as the GameObject properties were inherited
+
+     *********************** NOTES FOR SELF ******************************
   */
 }
 
-
-// Note: a prototype can have both methods AND properties declared on it
+/** Note: a prototype can have both methods AND properties declared on it **/
 
 CharacterStats.prototype = Object.create(GameObject.prototype);
 
 CharacterStats.prototype.takeDamage = function () {
   return `${this.name} took damage`;
 }
+
 /*
-  The order of the above two lines of code matters:
+  *********************** NOTES FOR SELF ******************************
+
+  The order of the ABOVE two lines of code matters:
 
   The value of CharacterStats.prototype has to first be set 
-  to the value returned by Object.create(GameObject.prototype)
-  (a copy of the GameObject.prototype object) before any new 
-  methods are declared on CharacterStats.prototype.
+  a copy of the GameObject.prototype object using Object.create().
 
   If the order is switched, then the method declared on
   CharacterStats.prototype will be immediately overwritten
-  by the GamObject.prototype and all the methods declared 
-  on _it_.
+  by the GamObject.prototype object.
 
   With the order set up correctly, the value of CharacterStats.prototype
   is new equal to the GameObject.prototype and all _it's_ declared
@@ -85,9 +92,10 @@ CharacterStats.prototype.takeDamage = function () {
 
   With this inheritance set in place, we can now safely declare additional 
   methods on CharacterStats.prototype without overriding any existing ones.
+
+  *********************** NOTES FOR SELF ******************************
 */
 
-/* ***************************************************************************** */
 
 /*
   === Humanoid (Having an appearance or character resembling that of a human.) ===
@@ -102,10 +110,14 @@ CharacterStats.prototype.takeDamage = function () {
 function Humanoid(attr) {
   CharacterStats.call(this, attr);
   /*
+      *********************** NOTES FOR SELF ******************************  
+
       this.createdAt = attr.createdAt;
       this.name = attr.name;
       this.dimensions = attr.dimensions;
       this.healthPoints = attr.healthPoints;
+
+      *********************** NOTES FOR SELF ******************************
   */
   this.team = attr.team;
   this.weapons = attr.weapons;
@@ -191,10 +203,10 @@ console.log(mage.takeDamage()); // Bruce took damage.
 console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
 
 
-  // Stretch task: 
-  // * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.  
-  // * Give the Hero and Villains different methods that could be used to remove health points from objects which could result in destruction if health gets to 0 or drops below 0;
-  // * Create two new objects, one a villain and one a hero and fight it out with methods!
+// Stretch task: 
+// * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.  
+// * Give the Hero and Villains different methods that could be used to remove health points from objects which could result in destruction if health gets to 0 or drops below 0;
+// * Create two new objects, one a villain and one a hero and fight it out with methods!
 
 function Villain(attr) {
   Humanoid.call(this, attr);
@@ -234,7 +246,7 @@ Hero.prototype.slay = function(foe) {
   foe.takeDamage();
 
   if(foe.healthPoints <= 0) {
-    foe.destroy();
+    console.log(foe.destroy());
   }
 }
 
@@ -264,7 +276,7 @@ const dave = new Hero({
   },
   healthPoints: 30,
   name: 'Dave',
-  team: '',
+  team: 'I don\'t know',
   weapons: [
     'Sword',
     'Darts',

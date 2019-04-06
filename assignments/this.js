@@ -1,32 +1,22 @@
 /* The for principles of "this";
 * in your own words. explain the four principle for the "this" keyword below.
 
-
-
-****  I made a lot of inferences here. I'm not sure I'm 100% correct, but I think I'm at least mostly correct ****
-
-
-
 * 1. Window/Global Object Binding -
-*       
-*       Global Object Binding is the "default" binding of 'this' when 'this' is bound to no other object.
+      
+        Global Object Binding is the "default" binding of 'this' when 'this' is bound to no other object.
+
         When 'this' is globally bound, depending on the JS Runtime Environment the value of 'this' can be
         different things. 
         
-        For example: console.log(this) executed purely in Node's runtime environment, will return the 'global' object which 'this' is bound to.
+        For example: console.log(this) executed purely in Node's runtime environment, will return the 'global' object..
         
-        console.log(this) executed in Node within a node.js file however, will return the value of an empty object "{}". 
-        This empty object actually refers to the 'module.exports' object. One utility of node.js is the ability to import and export variables,
-        functions, objects, even entire libraries to and from different node.js files in the same code base.
-        
-        If I executed module.export.name = 'Dave', and executed console.log(this) right afterwards, the value returned by the console.log 
-        would be {name: 'Dave'}, letting us now that the property 'name' now belongs to the 'modules.exports' objects, which can then be
-        imported by another node.js file.
+        console.log(this) executed in Node within a node.js file however, will return the value of the 'modules.export' object
 
         In your browser console, 'this' bound to the global scope will have the value of the 'window'.
 
-        In short, the exact value of a globally bound 'this' keyword will depend on the runtime environment your JS code is running in.
-        Generally speaking, the value will always be whatever "global" object is defined for that specific runtime environment.
+        The exact value of a globally bound 'this' keyword will depend on the runtime environment your JS code is running in.
+        
+        But generally speaking, the value will always be whatever "global" object is defined for that specific runtime environment.
       
 
 * 2. New Binding - 
@@ -35,72 +25,103 @@
         
         For example, take the following variable and JS constructor:
 
-        const greeting = "Hello, ";
+            const greeting = 'Hello, ';
 
-        function Person(name, lastName) {
-            this.name = name;
-            this.lastName = lastName;
-            this.sayName = function () {
-                console.log(`${greeting} my name is ${this.name} ${this.lastName}`);
+            function Person(name, lastName) {
+                this.name = name;
+                this.lastName = lastName;
+                this.sayName = function () {
+                    console.log(`${greeting} my name is ${this.name} ${this.lastName}`);
+                }
             }
-        }
 
-        At the moment, 'this' has no value, even though you can clearly see it written above. It only tells us what properties
-        will belong to a Person object if they are preceded by "this."" 
+        At the moment, 'this' has no value, even though it's written above. It only tells us what properties
+        will belong to a Person object when an instance of the object is instantiated.
 
-        The variable 'greeting' will not be a property of the Person object as it defined in the global scope and is not preceded
-        by "this."
+        The variable 'greeting' will _not_ be a property of the Person object as it defined in the global scope.
 
-        Only at the time of object instantiation using the 'new' keyword will 'this' get an assigned the value of the object or the object's scope.
+        Only at the time of object instantiation using the 'new' keyword will 'this' get an assigned a value of 
+        a new instance of that object.
+
+        Take the following Person object instantiation:
 
         const dave = new Person('Dave', 'Vazquez');
 
-        With the 'dave' Person object now instantiated, 'this' (within the scope of the 'dave' object) has the value of the 'dave' object itself.
+        With the 'dave' Person-object now created, 'this' (within the scope of the 'dave' object) has the value of the 'dave' object itself.
 
-        So, if I were to call dave.sayName(), the 'this' keyword now has a value whereby the values passed to 'this.name' and 'this.lastName' can be accessed from. 
-
-        The 'new' binding of the 'this' keyword to the an instance of the Person object like 'dave' is also what's needed for the method
-        dave.sayName() to return the value 'Hello, my name is Dave Vazquez'.
-
-        Just as the 'new' binding of the 'this' keyword to the instance of "const joe = new Person('Joe', "Schmoe")" is what's needed for the
-        method joe.sayName() of the 'joe' Person object to return the value "Hello, my name is Joe Schmoe".
+        So, if I were to call dave.sayName(), 'this.name' and 'this.lastName' inside the sayName() function have values to reference.
 
 * 3. Implicit Binding -  
 
         Implicit binding of the 'this' keyword occurs when an object literal is created.
 
-        For example, take the following object literal:
+        For example, take the object literal 'dave' and the call to dave.sayName():
 
-        const dave = {
-            name: 'Dave',
-            lastName: 'Vazquez',
-            sayName: function () {
-                console.log(`Hello, my name is ${this.name}, ${this.lastName});
+            const dave = {
+                name: 'Dave',
+                lastName: 'Vazquez',
+                sayName: function () {
+                    console.log(`Hello, my name is ${this.name}, ${this.lastName}.`);
+                }
             }
-        }
 
-        dave.sayName();
+            dave.sayName();
+            // joe.sayName();
 
-        Contrary to the example for 'new' binding above, we do not "explicitly" see "this." preceeding the
-        property names 'name' and 'lastName'. This is because the 'this' keyword is implied. We know 'name'
-        and 'lastName' belong to the object literal 'dave' because it is the only instance of 'dave' that
-        exists. 
+        Contrary to the example for 'new' binding above, we do not "explicitly" see the prefix "this." before the property names.
+        
+        This is because the 'this' keyword is implied. We know 'name' and 'lastName' belong to the object literal 'dave' because 
+        it is the only instance of 'dave' that exists. 
 
-        Only when we step inwards into the scope of the function expression of 'sayName' for example do we see 
-        the 'this' keyword appear, because 'this' is no longer implied. We are in a different scope, surrounded
-        by the object scope so we must access name and lastName from the 'this' keyword.
+        Only when we step inwards into the scope of the function expression of 'sayName' do we see the 'this' keyword appear, 
+        because 'this' is no longer implied. We are in a different scope _within_ the object scope, so we must access name and 
+        lastName from the 'this' keyword.
 
-        Outside the object literal we have a call of sayName() on the 'dave' object. As a rule of thumb, if you
-        want to know what value the 'this' keyword has, you need only look to the left of the . operator.
+        If we don't, 'name' and 'lastName' alone may either produce a Reference Error of 'not defined' or it may
+        take on the values of 'name' and 'lastName' declared elsewhere in the code as in:
 
-        Just as for a call of sayName() on a 'joe' object, joe.sayName(), to the left of the . operator is
-        what value 'this' has. 
+            const name = 'globalName';
+            const lastName = 'globalLastName';
 
-        It is because of implicit binding that the compiler knows when dave.sayName() is called, it's the 'this'
-        inside the sayName() function of 'dave' is where it will find 'dave's corresponding thi.name and thi.lastName values.
+            const dave = {...}
 
+            dave.sayName(); // 'Hello, my name is globalName, globalLastName.'
+        
+        As a rule of thumb, if you want to know what value the 'this' keyword has, you need only look to the left of the . operator.
 
-* 4. Explicity Binding
+* 4. Explicit Binding
+
+        Explicit Binding is when the value of 'this' in an pre-defined defined function or object is reassigned to the 
+        value of 'this' of another scope.
+
+        This reassignment can be acheived by using either the call(), apply() or bind() methods.
+
+        For example take the 'dave' and 'joe' objects below:
+
+            const dave = {
+                name: 'Dave',
+                speak: function (greeting) {
+                    console.log(`${greeting}, my name is ${this.name}!`);
+                }
+            }
+
+            const joe = {
+                name: 'Joe',
+                speak: function (greeting) {
+                    console.log(`${greeting}, my name is ${this.name}!`);
+                }
+            }
+
+            joe.speak.call(dave, 'Hey there');
+
+        'call' is invoked on the 'joe.speak' function-object and accepts an object as the first parameter, and arguments 
+        for each parameter of the 'joe.speak' function.
+        
+        The first parameter is the new object-value 'dave' which will be assigned to the keyword 'this'. Now when 'joe.speak'
+        is invoked using the 'call' method, it will use the property 'this.name' of 'dave to ouput:
+
+            'Hey there, my name is Dave!'
+
 *
 * write out a code example of each explanation above
 */
@@ -108,15 +129,13 @@
 /*********************************************************************************
 *                              PRINCIPLE 1                                       *
 **********************************************************************************/ 
-logHeader('Principle 1', '-Run the following in node and you will get the empty modules.export object, \'{}\'\n' +
-                         '-Run the following in the browser console and you will get the \'window\' object.\n' +
-                         '-Execute the code in the terminal in Node\'s Runtime Environment and you will get the \'global\' object.\n\n' +
-                         '~In all three instances you will get whatever global object of the runtime environment you are executing in~')
+logHeader('Principle 1 - Global Binding', '-Run console.log(this) in the browser console and you will get the \'window\' object.\n' +
+                                          '-Run console.log(this) in Node\'s Runtime Environment and you will get the \'global\' object.\n' +
+                                          'console.log(this) will log whatever global object of the runtime environment you are executing in.');
 /*
-    Run the following in node and you will get the empty modules.export object, {}
-    Run the following in the browser console and you will get the window object
-    execute the code in the terminal with Node's Runtime Environment and you will get the 'global' object
-    in all three instances you will get whatever global object of the runtime environment you are executing in
+    Run the following in the browser console and you will get the 'window' object.
+    Run the following in Node\'s Runtime Environment and you will get the 'global' object.
+    console.log(this) will log whatever global object of the runtime environment you are executing in.
 */
 
 console.log(this);
@@ -124,10 +143,10 @@ console.log(this);
 /*********************************************************************************
 *                              PRINCIPLE 2                                       *
 **********************************************************************************/ 
-logHeader('Principle 2', '// Code an example for Implicit Binding');
+logHeader('Principle 2 - Implicit Binding', '// Code an example for Implicit Binding');
 
 /*
-    code example for Implicit Binding
+    Code an example for Implicit Binding
 */
 
 const dave = {
@@ -140,23 +159,22 @@ const joe = {
     lastName: 'Schmoe',
 }
 
-const sayAyoWhaddupFunc = obj => {
+const sayAyoWaddupFunction = obj => {
     obj.sayAyo = function (otherGuy) {
-        console.log(`${obj.name} says: Ayo Whaddup ${otherGuy.name}!`);
+        console.log(`${obj.name} says: Ayo Waddup ${otherGuy.name}!`);
     }
 }
 
-sayAyoWhaddupFunc(dave);
-sayAyoWhaddupFunc(joe);
+sayAyoWaddupFunction(dave);
+sayAyoWaddupFunction(joe);
 
-dave.sayAyo(joe);
-joe.sayAyo(dave);
-
+dave.sayAyo(joe); // to the left of the . operator is what 'this' is
+joe.sayAyo(dave); // " "
 
 /*********************************************************************************
 *                              PRINCIPLE 3                                       *
 **********************************************************************************/ 
-logHeader('Principle 3', '//Code an example for New Binding');
+logHeader('Principle 3 - New Binding', '// Code an example for New Binding');
 
 /*
     code example for New Binding
@@ -171,23 +189,56 @@ function Thing (size, adjective, whatItDo) {
     }
 }
 
-const thing = new Thing('large', 'scary', 'consume my soul');
+const thing = new Thing('large', 'scary', 'gives me nightmares');
 
 console.log(thing);
 console.log();
 
-console.log('thing.sayWhatItDo();');
-console.log();
+console.log('thing.sayWhatItDo();\n');
 thing.sayWhatItDo()
 
 /*********************************************************************************
 *                              PRINCIPLE 3                                       *
 **********************************************************************************/ 
-logHeader('Principle 4', 'Code example for Explicit Binding');
+logHeader('Principle 4 - Explicity Binding', '// Code example for Explicit Binding');
 
 /*
     code example for Explicit Binding
 */
+
+const dave2 = {
+    name: 'Dave',
+    speak: function (greeting) {
+        console.log(`Hello, my name is ${this.name}!`);
+    }
+}
+
+const joe2 = {
+    name: 'Joe',
+    speak: function (greeting) {
+        console.log(`${greeting}, I go by the name ${this.name}!`);
+    }
+}
+
+const sing = function(rhyme) {
+    console.log(`La-dee-dah, I go by ${this.name}. La-dee-day, I am quite ${rhyme}.`);
+}
+
+const song = sing.bind(dave, 'brave');
+
+console.log('Explicit Binding with call():\n');
+console.log(joe2.speak.call(dave2, 'Hey there'));
+
+console.log('\nExplicit Binding with bind():\n');
+console.log(song());
+
+
+
+
+
+
+
+
 
 
 
